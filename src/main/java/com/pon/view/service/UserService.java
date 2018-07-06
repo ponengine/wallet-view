@@ -29,7 +29,7 @@ public class UserService {
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		MultiValueMap<String, Object> map =  new LinkedMultiValueMap<>();
 		
-		map.add("cityzenId", adduser.getCityzenId());
+		map.add("cityzenId", adduser.getCitizenId());
 		map.add("firstName", adduser.getFirstName());
 		map.add("lastName", adduser.getLastName());
 		map.add("password", adduser.getPassword());
