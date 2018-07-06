@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import com.pon.view.dto.Money;
+import com.pon.view.dto.WalletDTO;
 import com.pon.view.service.WalletService;
 
 @RestController
@@ -25,6 +26,16 @@ public class WalletController {
 	@PostMapping("/addwallet")
 	public String addWallet(@RequestBody Money money){
 		return walletservice.addmoneyservice(money);
+	}
+	
+	@PostMapping("/widraw")
+	public String widrawWallet(@RequestBody WalletDTO walletDTO){
+		return walletservice.widrawWallet(walletDTO);
+	}
+	
+	@PostMapping("/exchange")
+	public String exchangeWallet(@RequestBody WalletDTO walletDTO){
+		return walletservice.exchangeWallet(walletDTO);
 	}
 
 }
