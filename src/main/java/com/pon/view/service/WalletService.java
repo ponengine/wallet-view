@@ -3,6 +3,10 @@ package com.pon.view.service;
 
 
 
+import java.math.BigDecimal;
+import java.util.Map;
+
+import org.json.simple.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
@@ -13,8 +17,12 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pon.view.domain.BaseResponse;
+import com.pon.view.domain.BaseRestApi;
 import com.pon.view.dto.Money;
 import com.pon.view.dto.WalletDTO;
+
 
 
 
@@ -46,27 +54,46 @@ public class WalletService {
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		 MultiValueMap<String,Object> map =  new LinkedMultiValueMap<>();
 
-		 map.add("price", walletDTO.getWalletMoney());
-		 map.add("usernameBuyer", walletDTO.getUsernameBuyer());
+		 map.add("price", walletDTO.getMoney());
+		 map.add("usernameBuyer", walletDTO.getPayer());
 		
 		HttpEntity<String> entity = new HttpEntity<String>(map.toString() ,headers);
 		String response = rt.postForObject( uri, entity , String.class );
 		return response;
 	}
 
-	public String exchangeWallet(WalletDTO walletDTO) {
-		String uri = env.getProperty("wallet.uri")+"/managewallet/exchangewallet";
+	public BaseRestApi exchangeWallet(WalletDTO walletDTO) {
+		
+		BaseRestApi checkwallet = checkwallet(walletDTO);
+		if(!checkwallet.isSuccess()){
+			return checkwallet;
+		}
+		String uri = env.getProperty("wallet.uri")+"/api/walletpocket/exchangewallet";
 		RestTemplate rt = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
-		 MultiValueMap<String,Object> map =  new LinkedMultiValueMap<>();
+		JSONObject obj = new JSONObject();
+		obj.put("money", walletDTO.getMoney());
+		obj.put("payer", walletDTO.getPayer());
+		obj.put("receiver", walletDTO.getReceiver());	
+		HttpEntity<String> entity = new HttpEntity<String>(obj.toString() ,headers);
+		BaseRestApi response = rt.postForObject( uri, entity , BaseRestApi.class );
+		return response;
+	}
 
-		 map.add("price", walletDTO.getWalletMoney());
-		 map.add("usernameBuyer", walletDTO.getUsernameBuyer());
-		 map.add("usernameSeller", walletDTO.getUsernameSeller());
-		
-		HttpEntity<String> entity = new HttpEntity<String>(map.toString() ,headers);
-		String response = rt.postForObject( uri, entity , String.class );
+	public BaseRestApi checkwallet(WalletDTO walletDTO) {
+		 BaseRestApi baseRestApi = new BaseRestApi();
+		 BaseResponse<Map<String, Object>> baseResponse = new BaseResponse<>();
+		String uri = env.getProperty("wallet.uri")+"/api/walletpocket/checkuserandwallet";
+		RestTemplate rt = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		JSONObject obj = new JSONObject();
+		obj.put("money", walletDTO.getMoney());
+		obj.put("payer", walletDTO.getPayer());
+		obj.put("receiver", walletDTO.getReceiver());	
+		HttpEntity<String> entity = new HttpEntity<String>(obj.toString() ,headers);
+		BaseRestApi response = rt.postForObject( uri, entity , BaseRestApi.class );
 		return response;
 	}
 }
