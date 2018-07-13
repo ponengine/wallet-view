@@ -66,4 +66,5 @@ public class TransactionController {
 	public List<TransactionUserDTO> getUserToDay(){
 		return transactionservice.getusertoday();	
 	}
+	
 }

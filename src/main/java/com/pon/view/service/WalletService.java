@@ -20,7 +20,6 @@ import org.springframework.web.client.RestTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pon.view.domain.BaseResponse;
 import com.pon.view.domain.BaseRestApi;
-import com.pon.view.dto.Money;
 import com.pon.view.dto.WalletDTO;
 
 
@@ -32,7 +31,7 @@ public class WalletService {
 	@Autowired
 	private Environment env;
 
-	public String addmoneyservice(Money money) {
+	public String addmoneyservice(WalletDTO money) {
 		String uri = env.getProperty("wallet.uri")+"/managewallet/addwallet";
 		RestTemplate rt = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
@@ -40,7 +39,7 @@ public class WalletService {
 		 MultiValueMap<String,Object> map =  new LinkedMultiValueMap<>();
 
 		 map.add("price", money.getMoney());
-		 map.add("usernameBuyer", money.getUsername());
+		 map.add("payer", money.getPayer());
 		
 		HttpEntity<String> entity = new HttpEntity<String>(map.toString() ,headers);
 		String response = rt.postForObject( uri, entity , String.class );
@@ -94,6 +93,18 @@ public class WalletService {
 		obj.put("receiver", walletDTO.getReceiver());	
 		HttpEntity<String> entity = new HttpEntity<String>(obj.toString() ,headers);
 		BaseRestApi response = rt.postForObject( uri, entity , BaseRestApi.class );
+		return response;
+	}
+
+	public BaseRestApi canceltransaction(Long id,WalletDTO walletDTO) {
+		String uri = env.getProperty("wallet.uri")+"/api/walletpocket//calceltransaction/"+id;
+		RestTemplate rt = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		JSONObject obj = new JSONObject();
+		obj.put("money", walletDTO.getMoney());
+		HttpEntity<String> entity = new HttpEntity<String>(obj.toString() ,headers);
+		BaseRestApi response = rt.getForObject(uri, BaseRestApi.class);
 		return response;
 	}
 }

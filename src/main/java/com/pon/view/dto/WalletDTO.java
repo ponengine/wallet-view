@@ -1,6 +1,6 @@
 package com.pon.view.dto;
 
-import java.math.BigDecimal;
+
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,4 +13,5 @@ public class WalletDTO {
 	private String payer;
 	private String receiver;
 	private String note;
+	private String usernameadmin;
 }
