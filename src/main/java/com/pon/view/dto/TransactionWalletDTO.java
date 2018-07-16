@@ -12,4 +12,6 @@ public class TransactionWalletDTO {
 	private String status;
 	private String usernameBuyer;
 	private String usernameSeller;
+	
+	private int  money;
 }

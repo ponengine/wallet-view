@@ -4,6 +4,7 @@ package com.pon.view.service;
 
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.json.simple.JSONObject;
@@ -11,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
@@ -33,7 +35,7 @@ public class WalletService {
 	private Environment env;
 
 	public String addmoneyservice(Money money) {
-		String uri = env.getProperty("wallet.uri")+"/managewallet/addwallet";
+		String uri = env.getProperty("wallet.uri")+"api/walletpocket/addwallet";
 		RestTemplate rt = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -48,7 +50,7 @@ public class WalletService {
 	}
 
 	public String widrawWallet(WalletDTO walletDTO) {
-		String uri = env.getProperty("wallet.uri")+"/managewallet/withdrawwallet";
+		String uri = env.getProperty("wallet.uri")+"api/walletpocket/withdrawwallet";
 		RestTemplate rt = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -68,7 +70,22 @@ public class WalletService {
 		if(!checkwallet.isSuccess()){
 			return checkwallet;
 		}
-		String uri = env.getProperty("wallet.uri")+"/api/walletpocket/exchangewallet";
+		String uri = env.getProperty("wallet.uri")+"api/walletpocket/exchangewallet";
+		RestTemplate rt = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		JSONObject obj = new JSONObject();
+		obj.put("money", walletDTO.getMoney());
+		obj.put("payer", walletDTO.getPayer());
+		obj.put("receiver", walletDTO.getReceiver());
+		obj.put("note", walletDTO.getNote());
+		HttpEntity<String> entity = new HttpEntity<String>(obj.toString() ,headers);
+		BaseRestApi response = rt.postForObject( uri, entity , BaseRestApi.class );
+		return response;
+	}
+
+	public BaseRestApi checkwallet(WalletDTO walletDTO) {
+		String uri = env.getProperty("wallet.uri")+"api/walletpocket/checkuserandwallet";
 		RestTemplate rt = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -80,20 +97,19 @@ public class WalletService {
 		BaseRestApi response = rt.postForObject( uri, entity , BaseRestApi.class );
 		return response;
 	}
-
-	public BaseRestApi checkwallet(WalletDTO walletDTO) {
-		 BaseRestApi baseRestApi = new BaseRestApi();
-		 BaseResponse<Map<String, Object>> baseResponse = new BaseResponse<>();
-		String uri = env.getProperty("wallet.uri")+"/api/walletpocket/checkuserandwallet";
+	
+	public WalletDTO getwalletuser(String username) {
+		String uri = env.getProperty("wallet.uri")+"api/walletpocket/walletget/" + username;
+		System.out.println(">>>>" + uri);
 		RestTemplate rt = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
 		JSONObject obj = new JSONObject();
-		obj.put("money", walletDTO.getMoney());
-		obj.put("payer", walletDTO.getPayer());
-		obj.put("receiver", walletDTO.getReceiver());	
+		try{
+			 obj.put("usernameBuyer", username);
+			 }catch(Exception e){}
 		HttpEntity<String> entity = new HttpEntity<String>(obj.toString() ,headers);
-		BaseRestApi response = rt.postForObject( uri, entity , BaseRestApi.class );
+		WalletDTO response = rt.getForObject( uri, WalletDTO.class );
 		return response;
 	}
 }

@@ -74,7 +74,8 @@ public class TransactionService {
 	}
 
 	public List<TransactionWalletDTO> gettransactionbyuserall(String username) {
-		String uri = env.getProperty("wallet.uri")+"/transaction/getallbyuser";
+		String uri = env.getProperty("wallet.uri")+"api/transaction/user/getallbyuser/" + username;
+		System.out.println(">>>>>" + uri);
 		RestTemplate rt = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
 		headers.setContentType(MediaType.APPLICATION_JSON);
@@ -83,7 +84,7 @@ public class TransactionService {
 		 objstr.put("usernameBuyer", username);
 		 }catch(Exception e){}
 		HttpEntity<String> entity = new HttpEntity<String>(objstr.toString() ,headers);
-		List<TransactionWalletDTO> response = rt.postForObject( uri, entity , List.class );
+		List<TransactionWalletDTO> response = rt.getForObject( uri, List.class );
 		return response;	
 	}
 
